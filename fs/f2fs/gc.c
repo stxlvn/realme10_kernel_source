@@ -1331,9 +1331,8 @@ static int move_data_block(struct inode *inode, block_t bidx,
 	memcpy(page_address(fio.encrypted_page),
 				page_address(mpage), PAGE_SIZE);
 	f2fs_put_page(mpage, 1);
-	invalidate_mapping_pages(META_MAPPING(fio.sbi),
-				fio.old_blkaddr, fio.old_blkaddr);
-	f2fs_invalidate_compress_page(fio.sbi, fio.old_blkaddr);
+
+	f2fs_invalidate_internal_cache(fio.sbi, fio.old_blkaddr);
 
 	set_page_dirty(fio.encrypted_page);
 	if (clear_page_dirty_for_io(fio.encrypted_page))
@@ -1705,8 +1704,19 @@ static int do_garbage_collect(struct f2fs_sb_info *sbi,
 			f2fs_err(sbi, "Inconsistent segment (%u) type [%d, %d] in SSA and SIT",
 				 segno, type, GET_SUM_TYPE((&sum->footer)));
 			set_sbi_flag(sbi, SBI_NEED_FSCK);
+#ifndef CONFIG_DEVICE_XCOPY
 			f2fs_stop_checkpoint(sbi, false,
 				STOP_CP_REASON_CORRUPTED_SUMMARY);
+#else
+			if (!blk_queue_device_copy(bdev_get_queue(sbi->sb->s_bdev))) {
+				f2fs_stop_checkpoint(sbi, false,
+					STOP_CP_REASON_CORRUPTED_SUMMARY);
+			} else {
+				f2fs_handle_stop(sbi, STOP_CP_REASON_CORRUPTED_SUMMARY);
+				f2fs_err(sbi, "Workaround for SSA and SIT segment type mismatch when %s",
+					gc_type == BG_GC ? "BG_GC" : "FG_GC");
+			}
+#endif
 			goto skip;
 		}
 

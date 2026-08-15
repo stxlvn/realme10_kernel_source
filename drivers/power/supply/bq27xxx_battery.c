@@ -1856,6 +1856,43 @@ static int bq27xxx_battery_pwr_avg(struct bq27xxx_device_info *di,
 	return 0;
 }
 
+static int bq27xxx_battery_status(struct bq27xxx_device_info *di,
+				  union power_supply_propval *val)
+{
+	int status;
+
+	if (di->opts & BQ27XXX_O_ZERO) {
+		if (di->cache.flags & BQ27000_FLAG_FC)
+			status = POWER_SUPPLY_STATUS_FULL;
+		else if (di->cache.flags & BQ27000_FLAG_CHGS)
+			status = POWER_SUPPLY_STATUS_CHARGING;
+		else
+			status = POWER_SUPPLY_STATUS_DISCHARGING;
+	} else if (di->opts & BQ27Z561_O_BITS) {
+		if (di->cache.flags & BQ27Z561_FLAG_FC)
+			status = POWER_SUPPLY_STATUS_FULL;
+		else if (di->cache.flags & BQ27Z561_FLAG_DIS_CH)
+			status = POWER_SUPPLY_STATUS_DISCHARGING;
+		else
+			status = POWER_SUPPLY_STATUS_CHARGING;
+	} else {
+		if (di->cache.flags & BQ27XXX_FLAG_FC)
+			status = POWER_SUPPLY_STATUS_FULL;
+		else if (di->cache.flags & BQ27XXX_FLAG_DSC)
+			status = POWER_SUPPLY_STATUS_DISCHARGING;
+		else
+			status = POWER_SUPPLY_STATUS_CHARGING;
+	}
+
+	if ((status == POWER_SUPPLY_STATUS_DISCHARGING) &&
+	    (power_supply_am_i_supplied(di->bat) > 0))
+		status = POWER_SUPPLY_STATUS_NOT_CHARGING;
+
+	val->intval = status;
+
+	return 0;
+}
+
 static int bq27xxx_battery_capacity_level(struct bq27xxx_device_info *di,
 					  union power_supply_propval *val)
 {
@@ -1941,10 +1978,10 @@ static int bq27xxx_battery_get_property(struct power_supply *psy,
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
-		ret = bq27xxx_battery_current_and_status(di, NULL, val, NULL);
+		ret = bq27xxx_battery_status(di, val);
 		break;
 	case POWER_SUPPLY_PROP_VOLTAGE_NOW:
-		ret = bq27xxx_battery_voltage(di, val);
+		ret = bq27xxx_battery_current_and_status(di, NULL, val, NULL);
 		break;
 	case POWER_SUPPLY_PROP_PRESENT:
 		val->intval = di->cache.flags < 0 ? 0 : 1;
@@ -2020,7 +2057,7 @@ static void bq27xxx_external_power_changed(struct power_supply *psy)
 {
 	struct bq27xxx_device_info *di = power_supply_get_drvdata(psy);
 
-	/* After charger plug in/out wait 0.5s for things to stabilize */
+	/* After charger plug in/out wait 0.5s for things to stabilize *//* After charger plug in/out wait 0.5s for things to stabilize */
 	mod_delayed_work(system_wq, &di->work, HZ / 2);
 }
 

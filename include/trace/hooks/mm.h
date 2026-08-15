@@ -25,14 +25,11 @@
 #include <linux/rwsem.h>
 
 #ifdef __GENKSYMS__
-struct slabinfo;
 struct cgroup_subsys_state;
 struct device;
 struct mem_cgroup;
 struct readahead_control;
 #else
-/* struct slabinfo */
-#include <../mm/slab.h>
 /* struct cgroup_subsys_state */
 #include <linux/cgroup-defs.h>
 /* struct device */
@@ -104,6 +101,7 @@ DECLARE_HOOK(android_vh_alloc_pages_slowpath_begin,
 DECLARE_HOOK(android_vh_alloc_pages_slowpath_end,
 	     TP_PROTO(gfp_t gfp_mask, unsigned int order, unsigned long data),
 	     TP_ARGS(gfp_mask, order, data));
+struct slabinfo;
 struct dirty_throttle_control;
 DECLARE_HOOK(android_vh_mm_dirty_limits,
 	TP_PROTO(struct dirty_throttle_control *const gdtc, bool strictlimit,
@@ -117,6 +115,9 @@ DECLARE_HOOK(android_vh_oom_check_panic,
 DECLARE_HOOK(android_vh_save_vmalloc_stack,
 	TP_PROTO(unsigned long flags, struct vm_struct *vm),
 	TP_ARGS(flags, vm));
+DECLARE_HOOK(android_vh_kmalloc_slab,
+	TP_PROTO(unsigned int index, gfp_t flags, struct kmem_cache **s),
+	TP_ARGS(index, flags, s));
 DECLARE_HOOK(android_vh_show_stack_hash,
 	TP_PROTO(struct seq_file *m, struct vm_struct *v),
 	TP_ARGS(m, v));
@@ -149,9 +150,6 @@ DECLARE_HOOK(android_vh_mem_cgroup_css_online,
 DECLARE_HOOK(android_vh_mem_cgroup_css_offline,
 	TP_PROTO(struct cgroup_subsys_state *css, struct mem_cgroup *memcg),
 	TP_ARGS(css, memcg));
-DECLARE_HOOK(android_vh_kmalloc_slab,
-	TP_PROTO(unsigned int index, gfp_t flags, struct kmem_cache **s),
-	TP_ARGS(index, flags, s));
 DECLARE_HOOK(android_vh_mmap_region,
 	TP_PROTO(struct vm_area_struct *vma, unsigned long addr),
 	TP_ARGS(vma, addr));
@@ -287,18 +285,33 @@ DECLARE_HOOK(android_vh_get_swap_page,
 	TP_PROTO(struct page *page, swp_entry_t *entry,
 		struct swap_slots_cache *cache, bool *found),
 	TP_ARGS(page, entry, cache, found));
+DECLARE_HOOK(android_vh_add_to_avail_list,
+	TP_PROTO(struct swap_info_struct *p, bool *skip),
+	TP_ARGS(p, skip));
+DECLARE_HOOK(android_vh_del_from_avail_list,
+	TP_PROTO(struct swap_info_struct *p, bool *skip),
+	TP_ARGS(p, skip));
+DECLARE_HOOK(android_vh___cgroup_throttle_swaprate,
+	TP_PROTO(int nid, bool *skip),
+	TP_ARGS(nid, skip));
 DECLARE_HOOK(android_vh_madvise_cold_or_pageout,
 	TP_PROTO(struct vm_area_struct *vma, bool *allow_shared),
 	TP_ARGS(vma, allow_shared));
 DECLARE_HOOK(android_vh_page_isolated_for_reclaim,
 	TP_PROTO(struct mm_struct *mm, struct page *page),
 	TP_ARGS(mm, page));
+DECLARE_HOOK(android_vh_should_end_madvise,
+	TP_PROTO(struct mm_struct *mm, bool *skip, bool *pageout),
+	TP_ARGS(mm, skip, pageout));
 DECLARE_HOOK(android_vh_account_swap_pages,
 	TP_PROTO(struct swap_info_struct *si, bool *skip),
 	TP_ARGS(si, skip));
 DECLARE_HOOK(android_vh_unuse_swap_page,
 	TP_PROTO(struct swap_info_struct *si, struct page *page),
 	TP_ARGS(si, page));
+DECLARE_HOOK(android_vh_swap_avail_heads_init,
+	TP_PROTO(struct plist_head *swap_avail_heads),
+	TP_ARGS(swap_avail_heads));
 DECLARE_HOOK(android_vh_init_swap_info_struct,
 	TP_PROTO(struct swap_info_struct *p, struct plist_head *swap_avail_heads),
 	TP_ARGS(p, swap_avail_heads));
@@ -344,6 +357,9 @@ DECLARE_HOOK(android_vh_compact_finished,
 DECLARE_HOOK(android_vh_madvise_cold_or_pageout_abort,
 	TP_PROTO(struct vm_area_struct *vma, bool *abort_madvise),
 	TP_ARGS(vma, abort_madvise));
+DECLARE_HOOK(android_vh_skip_swapcache,
+	TP_PROTO(swp_entry_t entry, bool *skip),
+	TP_ARGS(entry, skip));
 /* macro versions of hooks are no longer required */
 
 #endif /* _TRACE_HOOK_MM_H */

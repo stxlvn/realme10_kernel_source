@@ -721,6 +721,11 @@ struct ufs_hba_monitor {
 	bool enabled;
 };
 
+#ifdef CONFIG_SCSI_BATCH_UNMAP
+struct ufs_fastdiscard_hba {
+	u32 fastdiscard_enable;
+};
+#endif
 /**
  * struct ufs_hba - per adapter private structure
  * @mmio_base: UFSHCI base register address

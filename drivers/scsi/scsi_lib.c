@@ -1560,6 +1560,10 @@ static blk_status_t scsi_prepare_cmd(struct request *req)
 	cmd->prot_op = SCSI_PROT_NORMAL;
 	if (blk_rq_bytes(req))
 		cmd->sc_data_direction = rq_dma_dir(req);
+#ifdef CONFIG_DEVICE_XCOPY
+	else if (op_is_copy(req_op(req)))
+		cmd->sc_data_direction = DMA_TO_DEVICE;
+#endif
 	else
 		cmd->sc_data_direction = DMA_NONE;
 
@@ -2376,6 +2380,9 @@ static void scsi_evt_emit(struct scsi_device *sdev, struct scsi_event *evt)
 		break;
 	case SDEV_EVT_POWER_ON_RESET_OCCURRED:
 		envp[idx++] = "SDEV_UA=POWER_ON_RESET_OCCURRED";
+		#if IS_ENABLED(CONFIG_MTK_FIX_SCSI_THREAD_RACING_UPDATE)
+		wait_event(sdev->host->host_wait, sdev->sdev_gendev.kobj.parent != NULL);
+		#endif
 		break;
 	default:
 		/* do nothing */

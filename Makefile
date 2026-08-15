@@ -521,7 +521,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
 		   -Werror=implicit-function-declaration -Werror=implicit-int \
 		   -Werror=return-type -Wno-format-security \
-		   -std=gnu89
+		   -std=gnu89 -Werror
 KBUILD_CPPFLAGS := -D__KERNEL__
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
@@ -1123,6 +1123,16 @@ export INSTALL_DTBS_PATH ?= $(INSTALL_PATH)/dtbs/$(KERNELRELEASE)
 
 MODLIB	= $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
 export MODLIB
+
+#ifdef OPLUS_FEATURE_CHG_BASIC
+KBUILD_CFLAGS += -DOPLUS_FEATURE_CHG_BASIC
+#endif
+
+#ifdef OPLUS_FEATURE_DISPLAY
+KBUILD_CFLAGS += -DOPLUS_FEATURE_DISPLAY
+KBUILD_CFLAGS += -DOPLUS_FEATURE_DISPLAY_TEMP_COMPENSATION
+KBUILD_CFLAGS += -DOPLUS_FEATURE_DISPLAY_APOLLO
+#endif
 
 #
 # INSTALL_MOD_STRIP, if defined, will cause modules to be
