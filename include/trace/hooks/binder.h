@@ -124,6 +124,10 @@ DECLARE_HOOK(android_vh_binder_read_done,
 DECLARE_HOOK(android_vh_binder_has_work_ilocked,
 	TP_PROTO(struct binder_thread *thread, bool do_proc_work, int *ret),
 	TP_ARGS(thread, do_proc_work, ret));
+DECLARE_HOOK(android_vh_binder_proc_transaction_finish,
+	TP_PROTO(struct binder_proc *proc, struct binder_transaction *t,
+		struct task_struct *binder_th_task, bool pending_async, bool sync),
+	TP_ARGS(proc, t, binder_th_task, pending_async, sync));
 DECLARE_HOOK(android_vh_alloc_oem_binder_struct,
 	TP_PROTO(struct binder_transaction_data *tr, struct binder_transaction *t,
 		struct binder_proc *proc),
@@ -144,6 +148,10 @@ DECLARE_HOOK(android_vh_binder_free_buf,
 	TP_PROTO(struct binder_proc *proc, struct binder_thread *thread,
 		struct binder_buffer *buffer),
 	TP_ARGS(proc, thread, buffer));
+DECLARE_HOOK(android_vh_binder_buffer_release,
+	TP_PROTO(struct binder_proc *proc, struct binder_thread *thread,
+		struct binder_buffer *buffer, bool has_transaction),
+	TP_ARGS(proc, thread, buffer, has_transaction));
 /* macro versions of hooks are no longer required */
 
 #endif /* _TRACE_HOOK_BINDER_H */
