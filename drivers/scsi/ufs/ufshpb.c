@@ -3630,7 +3630,7 @@ static unsigned long ufshpb_mem_free(struct ufshpb_lu *hpb, struct ufshpb_shrink
 	pkg->pages = pkg->pages > freed ? pkg->pages -= freed : 0;
 	return freed;
 }
-static int ufshpb_get_mm_lv()
+static int ufshpb_get_mm_lv(void)
 {
 	unsigned long available_pages;
 	int level;
@@ -3722,7 +3722,7 @@ static inline int ufshpb_lu_page_cnt(struct ufshpb_lu *hpb)
 	spin_unlock_irqrestore(&hpb->rgn_state_lock, flags);
 	return pages;
 }
-static long ufshpb_page_cnt()
+static long ufshpb_page_cnt(void)
 {
 	struct ufs_hba *hba = hpb_hba;
 	struct scsi_device *sdev;
