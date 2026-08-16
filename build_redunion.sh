@@ -6,7 +6,15 @@
 #
 # Requirements:
 #   - clang/lld/llvm-* available (see TOOLCHAIN_BIN below; this repo does not
-#     vendor a toolchain, point it at your own clang-21+ install)
+#     vendor a toolchain). Recommended: Neutron Clang
+#     (https://github.com/Neutron-Toolchains/clang-build-catalogue) --
+#     self-contained (bundles its own lld/llvm-ar/nm/objcopy/objdump/
+#     readelf/strip and up-to-date binutils sources), built for kernel
+#     cross-compilation, and noticeably faster to compile with than a
+#     stock distro clang. It does NOT ship llvm-ranlib/llvm-cov/
+#     llvm-addr2line -- symlink those from your distro's LLVM install
+#     (version mismatch is fine, they're rarely invoked). Any clang-21+
+#     works too if you'd rather not use Neutron.
 #   - binutils-aarch64-linux-gnu (for aarch64-linux-gnu-elfedit et al., used
 #     by the top-level Makefile to derive --target/--prefix for clang)
 #   - VENDOR_ROOT pointing at a sibling checkout of
