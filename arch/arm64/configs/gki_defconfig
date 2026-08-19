@@ -1,5 +1,19 @@
 # CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set
 CONFIG_CC_OPTIMIZE_FOR_SIZE=y
+
+# OPLUS's own mm/oplus_mm tuning suite (vendor/oplus/kernel/mm), already
+# symlinked into this tree but left at its Kconfig defaults (mostly "n").
+# These four have real, self-contained source with no missing headers,
+# verified against the vendor-source tree before enabling. Skipped
+# CONFIG_OPLUS_OOM_REAPER_OPT (Kconfig entry exists but no Makefile line or
+# source anywhere -- dead symbol) and CONFIG_PROCESS_RECLAIM_ENHANCE (needs
+# linux/healthinfo/fg.h, which doesn't exist anywhere in this kernel or
+# vendor-source tree -- would fail to build).
+CONFIG_OPLUS_FEATURE_ZRAM_OPT=y
+CONFIG_PROACTIVE_COMPACT=y
+CONFIG_KSHRINK_SLABD=y
+CONFIG_KSHRINK_LRUVECD=y
+
 CONFIG_AUDIT=y
 CONFIG_NO_HZ=y
 CONFIG_HIGH_RES_TIMERS=y
