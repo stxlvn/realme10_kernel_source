@@ -24,7 +24,6 @@
 #define HAPTIC_TRACK_EVENT_FRE_CALI_ERR        "haptic_fre_cli_err"
 #define HAPTIC_TRACK_EVENT_MEM_ALLOC_ERR       "haptic_mem_alloc_err"
 
-#ifdef CONFIG_OPLUS_CHARGER_MTK    /* mtk platform */
 #include <linux/device.h>
 #include <linux/version.h>
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0))
@@ -72,7 +71,6 @@ static inline void getnstimeofday(struct timespec *ts) {
 	ktime_get_real_ts64(&ts64);
 	*ts = timespec64_to_timespec(ts64);
 }
-#endif
 #endif
 
 /*********************************************************
