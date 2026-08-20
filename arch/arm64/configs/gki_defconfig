@@ -800,4 +800,11 @@ CONFIG_FUNCTION_ERROR_INJECTION=y
 # (no new symlink needed, just never turned on).
 CONFIG_AW8697_HAPTIC=m
 CONFIG_HAPTIC_FEEDBACK=m
+# haptic_feedback.c only includes soc/oplus/system/kernel_fb.h (for
+# struct kernel_packet_info) under #if defined(CONFIG_OPLUS_FEATURE_FEEDBACK)
+# || defined(_MODULE) -- without it, dcs_info's pointed-to struct is never
+# actually defined anywhere in the translation unit, hence "incomplete
+# type" on every member access. Already wired unconditionally via
+# drivers/soc/oplus/system/Kconfig -> feedback/Kconfig.
+CONFIG_OPLUS_FEATURE_FEEDBACK=m
 CONFIG_OPLUS_FEATURE_OPROJECT=m
