@@ -787,3 +787,17 @@ CONFIG_TRACEFS_DISABLE_AUTOMOUNT=y
 CONFIG_HIST_TRIGGERS=y
 CONFIG_FUNCTION_ERROR_INJECTION=y
 # CONFIG_RUNTIME_TESTING_MENU is not set
+
+# AW8697/aw869xx/aw8692x haptic driver (drivers/misc/aw8697_haptic), never
+# previously built by this tree at all -- test whether this is actually
+# the real vibrator IC on this board (regulator-vibrator and mediatek's
+# native vibrator node were both already confirmed non-functional on real
+# hardware). Modules (=m), not built-in: no devicetree binding is
+# confirmed yet, this is what LEDS_REGULATOR_VIBRATOR=y bootlooped on
+# before. depends on CONFIG_HAPTIC_FEEDBACK for oplus_haptic_track_dev_err
+# and CONFIG_OPLUS_FEATURE_OPROJECT for get_project()/is_project(), both
+# already wired via drivers/soc/oplus/boot -> vendor/oplus/kernel/boot
+# (no new symlink needed, just never turned on).
+CONFIG_AW8697_HAPTIC=m
+CONFIG_HAPTIC_FEEDBACK=m
+CONFIG_OPLUS_FEATURE_OPROJECT=m
