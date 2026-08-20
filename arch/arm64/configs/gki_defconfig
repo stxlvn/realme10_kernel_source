@@ -1,30 +1,11 @@
 # CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set
 CONFIG_CC_OPTIMIZE_FOR_SIZE=y
 
-# OPLUS's own mm/oplus_mm tuning suite (vendor/oplus/kernel/mm), already
-# symlinked into this tree but left at its Kconfig defaults (mostly "n").
-# These four have real, self-contained source with no missing headers,
-# verified against the vendor-source tree before enabling. Skipped
-# CONFIG_OPLUS_OOM_REAPER_OPT (Kconfig entry exists but no Makefile line or
-# source anywhere -- dead symbol) and CONFIG_PROCESS_RECLAIM_ENHANCE (needs
-# linux/healthinfo/fg.h, which doesn't exist anywhere in this kernel or
-# vendor-source tree -- would fail to build).
 CONFIG_OPLUS_FEATURE_ZRAM_OPT=y
 CONFIG_PROACTIVE_COMPACT=y
 CONFIG_KSHRINK_SLABD=y
 CONFIG_KSHRINK_LRUVECD=y
 
-# CONFIG_OPLUS_FEATURE_ZRAM_OPT's zram_opt.c calls test_task_ux() from
-# kernel/oplus_cpu/sched/sched_assist (already symlinked in via
-# kernel/oplus_cpu -> ../../vendor/oplus/kernel/cpu, but left disabled --
-# this is what broke CI). Traced the dependency chain by hand: every
-# cross-subsystem call inside sched_assist's core .c files is guarded
-# with #if IS_ENABLED(CONFIG_X), except this one -- OPLUS's own code
-# treats SCHED_ASSIST as always-on. sched_assist's sa_fair.c in turn
-# calls get_grp_adinfo()/oplus_cap_multiple from eas_opt's oplus_cap.c
-# (needs OPLUS_FEATURE_VT_CAP), and eas_opt.c itself unconditionally
-# calls oplus_sched_assist_iowait_proc_init() from oplus_iowait.c
-# (needs OPLUS_CPUFREQ_IOWAIT_PROTECT). Chain verified to terminate here.
 CONFIG_OPLUS_FEATURE_SCHED_ASSIST=y
 CONFIG_OPLUS_FEATURE_EAS_OPT=y
 CONFIG_OPLUS_FEATURE_VT_CAP=y
@@ -788,23 +769,7 @@ CONFIG_HIST_TRIGGERS=y
 CONFIG_FUNCTION_ERROR_INJECTION=y
 # CONFIG_RUNTIME_TESTING_MENU is not set
 
-# AW8697/aw869xx/aw8692x haptic driver (drivers/misc/aw8697_haptic), never
-# previously built by this tree at all -- test whether this is actually
-# the real vibrator IC on this board (regulator-vibrator and mediatek's
-# native vibrator node were both already confirmed non-functional on real
-# hardware). Modules (=m), not built-in: no devicetree binding is
-# confirmed yet, this is what LEDS_REGULATOR_VIBRATOR=y bootlooped on
-# before. depends on CONFIG_HAPTIC_FEEDBACK for oplus_haptic_track_dev_err
-# and CONFIG_OPLUS_FEATURE_OPROJECT for get_project()/is_project(), both
-# already wired via drivers/soc/oplus/boot -> vendor/oplus/kernel/boot
-# (no new symlink needed, just never turned on).
 CONFIG_AW8697_HAPTIC=m
 CONFIG_HAPTIC_FEEDBACK=m
-# haptic_feedback.c only includes soc/oplus/system/kernel_fb.h (for
-# struct kernel_packet_info) under #if defined(CONFIG_OPLUS_FEATURE_FEEDBACK)
-# || defined(_MODULE) -- without it, dcs_info's pointed-to struct is never
-# actually defined anywhere in the translation unit, hence "incomplete
-# type" on every member access. Already wired unconditionally via
-# drivers/soc/oplus/system/Kconfig -> feedback/Kconfig.
 CONFIG_OPLUS_FEATURE_FEEDBACK=m
 CONFIG_OPLUS_FEATURE_OPROJECT=m
